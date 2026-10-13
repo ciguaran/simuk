@@ -12,7 +12,7 @@ from simuk.tests.conftest import (
 )
 
 
-def test_posterior_sbc_with_update_data(simple_model_numpyro_trace):
+def test_posterior_sbc_with_update_data(simple_model_numpyro_trace, numpyro_nuts_kernel):
     with pytest.raises(NotImplementedError):
         simuk.SBC(
             numpyro_nuts_kernel,
@@ -24,7 +24,7 @@ def test_posterior_sbc_with_update_data(simple_model_numpyro_trace):
         )
 
 
-def test_posterior_sbc_with_augment_observed(simple_model_numpyro_trace):
+def test_posterior_sbc_with_augment_observed(simple_model_numpyro_trace, numpyro_nuts_kernel):
     """Posterior SBC with a custom augment_observed callback."""
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
@@ -39,7 +39,7 @@ def test_posterior_sbc_with_augment_observed(simple_model_numpyro_trace):
     assert sbc._simulations_complete == 2
 
 
-def test_posterior_sbc_with_custom_simulator(simple_model_numpyro_trace):
+def test_posterior_sbc_with_custom_simulator(simple_model_numpyro_trace, numpyro_nuts_kernel):
     """Posterior SBC using a custom simulator function."""
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
@@ -54,7 +54,7 @@ def test_posterior_sbc_with_custom_simulator(simple_model_numpyro_trace):
     assert sbc._simulations_complete == 2
 
 
-def test_posterior_sbc_numpyro(simple_model_numpyro_trace):
+def test_posterior_sbc_numpyro(simple_model_numpyro_trace, numpyro_nuts_kernel):
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
         method="posterior",
@@ -127,7 +127,7 @@ def test_posterior_sbc_trace_missing_group(
         )
 
 
-def test_posterior_sbc_too_many_simulations(simple_model_numpyro_trace):
+def test_posterior_sbc_too_many_simulations(simple_model_numpyro_trace, numpyro_nuts_kernel):
     """num_simulations > draws should raise ValueError."""
     assert simple_model_numpyro_trace["posterior"].dims == ChainMap({"chain": 1, "draw": 30})
     with pytest.raises(ValueError, match="more draws per"):
