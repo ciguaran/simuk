@@ -4,7 +4,7 @@ import logging
 
 import pytest
 import simuk
-from simuk.tests.helpers import (
+from simuk.tests.conftest import (
     simple_model,
     trace_simple,
     reg_model,

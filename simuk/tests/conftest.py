@@ -1,4 +1,5 @@
 """Tests for Posterior SBC (method='posterior')."""
+
 import jax
 import numpy as np
 import numpyro.distributions as dist
@@ -6,6 +7,7 @@ import pymc as pm
 from numpyro.infer import NUTS, MCMC
 import numpyro as npo
 import arviz as az
+import pytest
 
 default_rng = np.random.default_rng(1234)
 
@@ -76,10 +78,7 @@ def custom_augment_observed(model, observed_data, replicated_data, idx):
 
 def keep_only_replicated_data_augment(model, observed_data, replicated_data, idx):
     # Custom: keep only the replicated data
-    return {
-        var: replicated_data[var]
-        for var in replicated_data
-    }
+    return {var: replicated_data[var] for var in replicated_data}
 
 
 def update_data_reg(model, augmented_data, idx):
@@ -107,24 +106,30 @@ def simple_model_numpyro(y=None):
     y = npo.sample("y", dist.Normal(mu, sigma).expand([obs_data.shape[0]]), obs=y)
 
 
-rng_key = jax.random.PRNGKey(0)
+@pytest.fixture(scope="session")
+def numpyro_nuts_kernel():
+    yield NUTS(simple_model_numpyro)
 
-numpyro_nuts_kernel = NUTS(simple_model_numpyro)
-mcmc = MCMC(numpyro_nuts_kernel, num_warmup=100, num_samples=30)
 
+@pytest.fixture(scope="session")
+def simple_model_numpyro_trace(numpyro_nuts_kernel):
 
-mcmc.run(rng_key=rng_key, y=obs_data)
+    rng_key = jax.random.PRNGKey(0)
 
-trace = mcmc.get_samples(group_by_chain=True)
+    mcmc = MCMC(numpyro_nuts_kernel, num_warmup=100, num_samples=30)
 
-# TODO TURN INTO A FEATURE THAT GETS RUN ONCE
-simple_model_numpyro_trace = az.from_dict(
-    {
-        "posterior": trace,
-        #"observed_data": {"y": np.expand_dims(obs_data, 0)},
-        "observed_data": {"y": obs_data},
-    },
-    dims={"mu": ["chain", "draw"], "y": ["observation_idx"]},
-    coords={"y": x_obs},
-    sample_dims=["chain", "draw"],
-)
+    mcmc.run(rng_key=rng_key, y=obs_data)
+
+    trace = mcmc.get_samples(group_by_chain=True)
+    simple_model_numpyro_trace = az.from_dict(
+        {
+            "posterior": trace,
+            # "observed_data": {"y": np.expand_dims(obs_data, 0)},
+            "observed_data": {"y": obs_data},
+        },
+        dims={"mu": ["chain", "draw"], "y": ["observation_idx"]},
+        coords={"y": x_obs},
+        sample_dims=["chain", "draw"],
+    )
+
+    yield simple_model_numpyro_trace

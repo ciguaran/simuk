@@ -3,9 +3,8 @@ import pytest
 import simuk
 import numpy as np
 
-from simuk.tests.helpers import (
+from simuk.tests.conftest import (
     numpyro_nuts_kernel,
-    simple_model_numpyro_trace,
     obs_data,
     custom_simulator,
     keep_only_replicated_data_augment,
@@ -13,7 +12,7 @@ from simuk.tests.helpers import (
 )
 
 
-def test_posterior_sbc_with_update_data():
+def test_posterior_sbc_with_update_data(simple_model_numpyro_trace):
     with pytest.raises(NotImplementedError):
         simuk.SBC(
             numpyro_nuts_kernel,
@@ -25,7 +24,7 @@ def test_posterior_sbc_with_update_data():
         )
 
 
-def test_posterior_sbc_with_augment_observed():
+def test_posterior_sbc_with_augment_observed(simple_model_numpyro_trace):
     """Posterior SBC with a custom augment_observed callback."""
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
@@ -40,8 +39,7 @@ def test_posterior_sbc_with_augment_observed():
     assert sbc._simulations_complete == 2
 
 
-
-def test_posterior_sbc_with_custom_simulator():
+def test_posterior_sbc_with_custom_simulator(simple_model_numpyro_trace):
     """Posterior SBC using a custom simulator function."""
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
@@ -56,8 +54,7 @@ def test_posterior_sbc_with_custom_simulator():
     assert sbc._simulations_complete == 2
 
 
-
-def test_posterior_sbc_numpyro():
+def test_posterior_sbc_numpyro(simple_model_numpyro_trace):
     sbc = simuk.SBC(
         numpyro_nuts_kernel,
         method="posterior",
@@ -75,7 +72,7 @@ def test_posterior_sbc_numpyro():
     assert posterior_sbc.dims == ChainMap({"chain": 1, "draw": 2})
 
 
-def test_posterior_sbc_with_transform():
+def test_posterior_sbc_with_transform(simple_model_numpyro_trace, numpyro_nuts_kernel):
     """Posterior SBC with a transform(name, value) function."""
     sbc_with_transforms = simuk.SBC(
         numpyro_nuts_kernel,
@@ -106,7 +103,7 @@ def test_posterior_sbc_with_transform():
     assert sbc_with_transforms._simulations_complete == 2
 
 
-def test_posterior_sbc_no_trace():
+def test_posterior_sbc_no_trace(numpyro_nuts_kernel):
     """method='posterior' without trace should raise ValueError."""
     with pytest.raises(ValueError, match="posterior samples from the"):
         simuk.SBC(
@@ -116,7 +113,9 @@ def test_posterior_sbc_no_trace():
 
 
 @pytest.mark.parametrize("missing_group", ["posterior", "observed_data"])
-def test_posterior_sbc_trace_missing_group(missing_group):
+def test_posterior_sbc_trace_missing_group(
+    missing_group, simple_model_numpyro_trace, numpyro_nuts_kernel
+):
     """trace without 'posterior' group should raise ValueError."""
     trace_missing = simple_model_numpyro_trace.copy()
     del trace_missing[missing_group]
@@ -128,7 +127,7 @@ def test_posterior_sbc_trace_missing_group(missing_group):
         )
 
 
-def test_posterior_sbc_too_many_simulations():
+def test_posterior_sbc_too_many_simulations(simple_model_numpyro_trace):
     """num_simulations > draws should raise ValueError."""
     assert simple_model_numpyro_trace["posterior"].dims == ChainMap({"chain": 1, "draw": 30})
     with pytest.raises(ValueError, match="more draws per"):

@@ -182,7 +182,7 @@ class NumpyroAdapter(BackendAdapter):
         self, simulation_parameters, replicated_data, sample_kwargs, seed, method, simulation_idx
     ):
         """Generate posterior samples using numpyro conditioned to a predictive sample.
-         (either prior predictive or posterior predictive)"""
+        (either prior predictive or posterior predictive)"""
         mcmc = MCMC(self.numpyro_model, **sample_kwargs)
         rng_seed = jax.random.PRNGKey(seed)
 
@@ -257,7 +257,6 @@ class NumpyroAdapter(BackendAdapter):
             var_name: np.expand_dims(predictive[var_name].isel(sample=idx).values, axis=0)
             for var_name in simulation_params.observed_vars
         }
-
 
     def stop_if_cant_run_without_simulator(self):
         if not self.observed_model_vars:
