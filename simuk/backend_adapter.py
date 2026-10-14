@@ -1,6 +1,7 @@
-import numpy as np
 from abc import ABC, abstractmethod
-from typing import Mapping
+from collections.abc import Mapping
+
+import numpy as np
 from arviz_base import dict_to_dataset
 
 
@@ -64,6 +65,7 @@ class BackendAdapter(ABC):
 
 def get_simulator_data(simulator, free_rv_samples, seeds):
     """Run the user-defined simulator to obtain predictive samples.
+
     These samples can be generated from either prior or posterior samples.
     Precondition: the number of samples in free_rv_samples must equal the length of seeds.
     """

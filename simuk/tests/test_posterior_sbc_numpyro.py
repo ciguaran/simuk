@@ -1,14 +1,14 @@
 from collections import ChainMap
-import pytest
-import simuk
-import numpy as np
 
+import numpy as np
+import pytest
+
+import simuk
 from simuk.tests.conftest import (
-    numpyro_nuts_kernel,
-    obs_data,
     custom_simulator,
-    keep_only_replicated_data_augment,
     custom_transform,
+    keep_only_replicated_data_augment,
+    obs_data,
 )
 
 

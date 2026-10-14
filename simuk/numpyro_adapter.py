@@ -182,7 +182,9 @@ class NumpyroAdapter(BackendAdapter):
         self, simulation_parameters, replicated_data, sample_kwargs, seed, method, simulation_idx
     ):
         """Generate posterior samples using numpyro conditioned to a predictive sample.
-        (either prior predictive or posterior predictive)"""
+
+        Predictive sample can be either prior predictive or posterior predictive.
+        """
         mcmc = MCMC(self.numpyro_model, **sample_kwargs)
         rng_seed = jax.random.PRNGKey(seed)
 
@@ -249,9 +251,9 @@ class NumpyroAdapter(BackendAdapter):
         return ref_params, predictive
 
     def replicate(self, predictive, idx, simulation_params):
-        """
-        returns a dictionary of (replication_size,trailing dims) arrays.
-        For now replication_size is fixed to one
+        """Return a dictionary of (replication_size,trailing dims) arrays.
+
+        For now replication_size is fixed to one.
         """
         return {
             var_name: np.expand_dims(predictive[var_name].isel(sample=idx).values, axis=0)

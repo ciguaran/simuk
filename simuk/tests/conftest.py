@@ -1,13 +1,13 @@
 """Tests for Posterior SBC (method='posterior')."""
 
+import arviz as az
 import jax
 import numpy as np
+import numpyro as npo
 import numpyro.distributions as dist
 import pymc as pm
-from numpyro.infer import NUTS, MCMC
-import numpyro as npo
-import arviz as az
 import pytest
+from numpyro.infer import MCMC, NUTS
 
 default_rng = np.random.default_rng(1234)
 

@@ -3,16 +3,17 @@
 import logging
 
 import pytest
+
 import simuk
 from simuk.tests.conftest import (
-    simple_model,
-    trace_simple,
-    reg_model,
-    trace_reg,
-    update_data_reg,
-    custom_simulator,
     custom_augment_observed,
+    custom_simulator,
     custom_transform,
+    reg_model,
+    simple_model,
+    trace_reg,
+    trace_simple,
+    update_data_reg,
 )
 
 
